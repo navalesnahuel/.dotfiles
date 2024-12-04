@@ -49,7 +49,7 @@ floating_modifier $mod
 tiling_drag modifier titlebar
 
 # start a terminal
-bindsym $mod+Return exec flatpak run org.wezfurlong.wezterm
+bindsym $mod+Return exec wezterm
 
 # kill focused window
 bindsym $mod+q kill
@@ -225,8 +225,6 @@ exec --no-startup-id xinput --set-prop 14 "libinput Accel Profile Enabled" 0, 1
 exec --no-startup-id xset m 0 0
 
 # Execute programs
-exec --no-startup-id gnome-terminal
-# exec --no-startup-id flatpak run org.wezfurlong.wezterm start -- tmux
 exec --no-startup-id wezterm start -- tmux
 
 exec --no-startup-id (command -v obsidian && obsidian) || echo "Obsidian no está instalado"
@@ -234,7 +232,7 @@ exec --no-startup-id (command -v firefox && firefox) || echo "Firefox no está i
 exec --no-startup-id (command -v code && code) || echo "VSCode no está instalado"
 
 ## [Assign apps to workspaces]
-assign      [class="WezTerm"] $ws1
+assign      [class="org.wezfurlong.wezterm"] $ws1
 assign      [class="firefox"]   $ws2
 assign      [class="obsidian"]   $ws4
 assign      [class="Code"]   $ws3
@@ -242,4 +240,4 @@ assign      [class="Code"]   $ws3
 # Establecer fondos de pantalla si existen
 exec_always [ -f ~/Pictures/Wallpapers/999.png ] && feh --bg-fill ~/Pictures/Wallpapers/999.png
 # Ejecutar script de ajuste de vibración digital si existe
-exec_always [ -f ~/Scripts/Start-up/set_digital_vibrance.sh ] && ~/Scripts/Start-up/set_digital_vibrance.sh
+exec_always [ -f ~/.config/linux/set_digital_vibrance.sh] && ~/.config/linux/set_digital_vibrance.sh

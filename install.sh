@@ -1,4 +1,4 @@
-#!/bin/bash
+!/bin/bash
 
 # Salir si ocurre algún error
 set -e
@@ -15,7 +15,7 @@ echo -e "${GREEN}Iniciando el script de configuración...${RESET}"
 # Actualizar el sistema y asegurarse de que los paquetes esenciales estén instalados
 echo -e "${GREEN}Actualizando sistema y paquetes esenciales...${RESET}"
 sudo apt update && sudo apt upgrade -y
-sudo apt install -y curl wget git unzip build-essential fonts-powerline xclipa lsd tmux nodejs npm ripgrep fd-find
+sudo apt install -y curl wget git unzip build-essential fonts-powerline xclip lsd tmux nodejs npm ripgrep fd-find
 
 # Instalar i3 y dependencias
 echo -e "${GREEN}Instalando i3 y dependencias...${RESET}"
@@ -47,11 +47,8 @@ rm nvim-linux64.tar.gz
 
 # Instalar WezTerm
 echo -e "${GREEN}Instalando WezTerm...${RESET}"
-wget https://github.com/wez/wezterm/releases/latest/download/wezterm-linux.tar.gz
-tar -xvzf wezterm-linux.tar.gz
-sudo mv wezterm /opt/wezterm
-sudo ln -sf /opt/wezterm/bin/wezterm /usr/local/bin/wezterm
-rm wezterm-linux.tar.gz
+curl -LO https://github.com/wez/wezterm/releases/download/20240203-110809-5046fc22/wezterm-20240203-110809-5046fc22.Ubuntu22.04.deb
+sudo apt install -y ./wezterm-20240203-110809-5046fc22.Ubuntu22.04.deb
 
 # Instalar Tmux Package Manager (TPM)
 TPM_DIR="$HOME/.tmux/plugins/tpm"
@@ -74,14 +71,13 @@ echo -e "${GREEN}Copiando configuraciones...${RESET}"
 mkdir -p "$HOME/.config/linux"
 mkdir -p "$HOME/.config/tmux"
 mkdir -p "$HOME/.config/nvim"
-mkdir -p "$HOME/.config/wezterm"
 mkdir -p "$HOME/.config/i3"
 
 cp "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
-cp "$DOTFILES_DIR/scripts/set_digital_vibrance.sh" "$HOME/.config/linux/set_digital_vibrance.sh"
-cp -r "$DOTFILES_DIR/tmux/" "$HOME/.config/tmux"
-cp -r "$DOTFILES_DIR/nvim/" "$HOME/.config/nvim"
-cp -r "$DOTFILES_DIR/wezterm/" "$HOME/.config/wezterm"
+cp "$DOTFILES_DIR/linux/set_digital_vibrance.sh" "$HOME/.config/linux/set_digital_vibrance.sh"
+cp -r "$DOTFILES_DIR/tmux/" "$HOME/.config/"
+cp -r "$DOTFILES_DIR/nvim/" "$HOME/.config/"
+cp -r "$DOTFILES_DIR/wezterm/.wezterm.lua" "$HOME/.wezterm.lua"
 cp -r "$DOTFILES_DIR/i3/config" "$HOME/.config/i3"
 cp "$DOTFILES_DIR/i3/.i3status.conf" "$HOME/.i3status.conf"
 
