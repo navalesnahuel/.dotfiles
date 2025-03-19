@@ -48,6 +48,9 @@ This repository contains my personal configuration files for various application
 - **Batcat** → Better `cat` command  
 - **fd-find** → Fast file searching  
 
+
+### To update the submodules in this repo 
+
+````git submodule update --remote --merge````
+
 ---
-
-
