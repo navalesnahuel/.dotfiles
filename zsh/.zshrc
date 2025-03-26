@@ -15,7 +15,6 @@ setopt PROMPT_SUBST
 PROMPT='%F{magenta}nahuel%f %F{blue}%1~%f %F{red}${vcs_info_msg_0_}%f$ '
 
 # ENVIRONMENT VARIABLES
-export GEMINI_API_KEY='AIzaSyDMTiHFZbmzQxE7LD9tM6FMHJq3QQjE6G0'
 export BAT_STYLE="changes,header"
 export BAT_PAGER="less -FRX"
 
