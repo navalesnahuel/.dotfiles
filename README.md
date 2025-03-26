@@ -35,6 +35,7 @@ This repository contains my personal configuration files for various application
 - **tree-sitter** → Syntax parsing tool  
 - **gh** → GitHub CLI  
 - **zoxide** → Smart `cd` replacement  
+- **rofi** → for i3 search
 
 ### 📜 Programming Languages & Runtimes  
 - **Go**  

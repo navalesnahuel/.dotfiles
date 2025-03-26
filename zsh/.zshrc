@@ -1,77 +1,80 @@
-# =============================
-# Paths
-# =============================
-[ -d "/opt/nvim-linux64/bin" ] && export PATH="$PATH:/opt/nvim-linux64/bin"
+# ZSH CONFIGURATION
 
-export PATH="$PATH:/usr/local/zig"
-
-if [ -d "/usr/local/go" ]; then
-    export GOROOT="/usr/local/go"
-    export GOPATH="$HOME/go"
-    export PATH="$GOPATH/bin:$GOROOT/bin:$HOME/.local/bin:$PATH"
+# OH MY ZSH SETUP
+if [ -d "$HOME/.oh-my-zsh" ]; then
+    export ZSH="$HOME/.oh-my-zsh"
+    plugins=(git tmux tldr)
+    source $ZSH/oh-my-zsh.sh
 fi
 
-export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
-export PATH="$JAVA_HOME/bin:$PATH"
-
-# =============================
-# Environment Variables
-# =============================
-
-# =============================
-# Prompt Configuration
-# =============================
+# PROMPT CONFIGURATION
 autoload -Uz vcs_info
 precmd() { vcs_info }
 zstyle ':vcs_info:git:*' formats '%b '
 setopt PROMPT_SUBST
-# PROMPT='%F{magenta}%m%f %F{blue}%1~%f %F{red}${vcs_info_msg_0_}%f$ '
 PROMPT='%F{magenta}nahuel%f %F{blue}%1~%f %F{red}${vcs_info_msg_0_}%f$ '
 
-# =============================
-# Oh My Zsh
-# =============================
-if [ -d "$HOME/.oh-my-zsh" ]; then
-    export ZSH="$HOME/.oh-my-zsh"
-    plugins=(git)
-    source $ZSH/oh-my-zsh.sh
+# ENVIRONMENT VARIABLES
+export GEMINI_API_KEY='AIzaSyDMTiHFZbmzQxE7LD9tM6FMHJq3QQjE6G0'
+export BAT_STYLE="changes,header"
+export BAT_PAGER="less -FRX"
+
+# PATH CONFIGURATIONS
+# Neovim
+[ -d "/opt/nvim-linux64/bin" ] && export PATH="$PATH:/opt/nvim-linux64/bin"
+
+# Zig
+export PATH="$PATH:/usr/local/zig"
+
+# Go
+if [ -d "/usr/local/go" ]; then
+    export GOROOT="/usr/local/go"
+    export GOPATH="$HOME/go"
+    export PATH="$GOROOT/bin:$GOPATH/bin:$HOME/.local/bin:$PATH"
 fi
 
-# =============================
-# Aliases
-# =============================
+
+# Java
+export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
+export PATH="$JAVA_HOME/bin:$PATH"
+
+# PLUGIN MANAGEMENT
+# Node Version Manager
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+# Zoxide (smarter cd)
+eval "$(zoxide init zsh)"
+
+# Syntax highlighting
+source ~/.zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
+
+# ALIASES
+# File operations
 alias pbcopy='xclip -selection clipboard'
 alias pbpaste='xclip -selection clipboard -o'
-alias windows='sudo grub-reboot "Windows" && sudo reboot'
 unalias ls 2>/dev/null
 alias ls='lsd'
 alias l='ls -l'
 alias la='ls -la'
 alias lt='ls --tree'
+
+# Enhanced tools
+alias fd="fdfind --hidden --follow --exclude .git"
+alias bat="batcat"
+alias cat="bat --paging=never"
+alias grep='rg --no-ignore'
+alias tldr="tldr -t base16"
+alias cd="z"
 alias kubectl="minikube kubectl --"
 
-# fd-find
-alias fd="fdfind --hidden --follow --exclude .git"
-
-# bat
-alias bat="batcat"
-
-# =============================
-# Node Version Manager (NVM)
-# =============================
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-
-# =============================
-# fzf Configuration
-# =============================
+# FZF CONFIGURATION
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 export FZF_DEFAULT_COMMAND='fdfind --type f'
 export FZF_CTRL_T_COMMAND='fdfind --type f'
 
-# Cleaner fzf UI with minimal distractions
-
+# FZF appearance
 export FZF_DEFAULT_OPTS=" \
 --border=rounded \
 --height=20% \
@@ -92,42 +95,123 @@ export FZF_DEFAULT_OPTS=" \
 --layout=reverse
 "
 
-# Open nvim in file
-bindkey -s '^N' 'selected_file=$(fd --type f | fzf) && [ -n "$selected_file" ] && nvim "$selected_file"\n'
+# FZF Shortcuts 
+# Neovim file selection
+nvim_finder() {
+  local selected_file
+  selected_file=$(fd --type f --hidden \
+    -E ".git" \
+    -E ".git/**" \
+    -E "node_modules" \
+    -E "node_modules/**" \
+    -E ".cache" \
+    -E ".cache/**" \
+    -E ".venv" \
+    -E ".venv/**" \
+    -E ".vscode" \
+    -E ".vim" \
+    -E ".vscode/**" \
+    -E "go/pkg" \
+    -E "go/pkg/**" \
+    -E ".npm" \
+    -E ".npm/**" \
+    -E "dist" \
+    -E "dist/**" \
+    -E "build" \
+    -E "build/**" \
+    -E ".idea" \
+    -E "__pycache__" \
+    -E "*.pyc" \
+    -E "*.o" \
+    -E "*.so" \
+    -E "*.dylib" \
+    -E "*.dll" \
+    -E "*.class" \
+    -E "*.exe" \
+    -E "*.bin" \
+    -E "*.lock" | 
+    fzf --preview 'bat --color=always --style=numbers --line-range=:50 {}')
+  [[ -n "$selected_file" ]] && nvim "$selected_file"
+}
+bindkey -s '^N' 'nvim_finder\n'
 
-# Fast directory jump
-bindkey -s '^G' 'selected_dir=$(fd --type d | fzf) && [ -n "$selected_dir" ] && cd "$selected_dir"\n'
+# Directory navigation - with depth limit and cache
+dir_jumper() {
+  local selected_dir
+  selected_dir=$(fd --type d --hidden \
+    -E ".git" \
+    -E ".git/**" \
+    -E "node_modules" \
+    -E "node_modules/**" \
+    -E ".cache" \
+    -E ".cache/**" \
+    -E ".venv" \
+    -E ".vim" \
+    -E ".venv/**" \
+    -E ".vscode" \
+    -E ".vscode/**" \
+    -E "go/pkg" \
+    -E "go/pkg/**" \
+    -E ".npm" \
+    -E ".npm/**" \
+    -E "dist" \
+    -E "dist/**" \
+    -E "build" \
+    -E "build/**" \
+    -E ".idea" \
+    -E "__pycache__" | fzf)
+  [[ -n "$selected_dir" ]] && cd "$selected_dir"
+}
+bindkey -s '^G' 'dir_jumper\n'
 
-# Fuzzy kill process with more details
-bindkey -s '^K' 'kill -9 $(ps -eo pid,user,pcpu,pmem,time,comm | sort -k 3 -r | fzf | awk '\''{print $1}'\'')\n'
+# Process management - with optimized process listing and better formatting
+process_killer() {
+  local pid
+  pid=$(ps -eo pid,pcpu,pmem,comm --sort=-pcpu | 
+         grep -v PID | 
+         head -30 | 
+         fzf --header="PID %CPU %MEM COMMAND" --header-lines=0 |
+         awk '{print $1}')
+  [[ -n "$pid" ]] && kill -9 "$pid"
+}
+bindkey -s '^K' 'process_killer\n'
 
-# Fuzzy git branch checkout
-bindkey -s '^B' 'git branch | fzf | xargs git checkout\n'
+# Git operations - with branch info and faster checkout
+git_checkout() {
+  local branch
+  branch=$(git branch --sort=-committerdate --format='%(refname:short) (%(committerdate:relative))' 2>/dev/null | 
+           fzf --no-multi --header="Select branch to checkout" | 
+           awk '{print $1}')
+  [[ -n "$branch" ]] && git checkout "$branch"
+}
+bindkey -s '^B' 'git_checkout\n'
 
-# Docker FZF management function
+# DOCKER MANAGEMENT WITH FZF
+# Enhanced with container info and faster listings
 fzf_docker() {
-  local action=$(echo "ps logs exec stop start restart rm stats" | tr " " "\n" | fzf --prompt="Docker action: ")
+  local action
+  action=$(echo -e "ps\nlogs\nexec\nstop\nstart\nrestart\nrm\nstats" | 
+           fzf --prompt="Docker action: " --height=10%)
   
   case "$action" in
     ps)
       docker ps ;;
     logs)
-      docker logs -f $(docker ps --format "{{.Names}}" | fzf --prompt="Select container: ") ;;
+      local container
+      container=$(docker ps --format "{{.Names}} ({{.Image}})" | 
+                 fzf --prompt="Select container: " --height=40%)
+      [[ -n "$container" ]] && docker logs -f "${container%% *}" ;;
     exec)
-      docker exec -it $(docker ps --format "{{.Names}}" | fzf --prompt="Select container: ") /bin/bash ;;
+      local container
+      container=$(docker ps --format "{{.Names}} ({{.Image}})" | 
+                 fzf --prompt="Select container: " --height=40%)
+      [[ -n "$container" ]] && docker exec -it "${container%% *}" /bin/bash ;;
     stop|start|restart|rm|stats)
-      docker $action $(docker ps -a --format "{{.Names}}" | fzf --prompt="Select container: ") ;;
+      local container
+      container=$(docker ps -a --format "{{.Names}} ({{.Status}})" | 
+                 fzf --prompt="Select container: " --height=40%)
+      [[ -n "$container" ]] && docker "$action" "${container%% *}" ;;
   esac
 }
-
-# Bind to Ctrl+D
+# Docker shortcut
 bindkey -s '^D' 'fzf_docker\n'
-
-# =============================
-# Plugins
-# =============================
-eval $(thefuck --alias)
-
-source ~/.zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
-
-
